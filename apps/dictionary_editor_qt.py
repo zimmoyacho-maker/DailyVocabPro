@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-DailyVocabPro Master Dictionary Editor v2.2 Productivity
+DailyVocabPro Master Dictionary Editor v2.3 Translation Assist
 
 New in v2.2
 -----------
@@ -216,6 +216,58 @@ def recommend_memo(word: str, meaning: str, example: str) -> str:
     return "\n".join(dict.fromkeys(notes))
 
 
+def recommend_example_ko(word: str, meaning: str, example: str) -> str:
+    """Offline draft translator.
+
+    This is not a full AI translator. It creates a useful first draft using
+    common sentence patterns and vocabulary-learning templates.
+    The user should review and polish the result.
+    """
+    e = example.strip()
+    lower = e.lower().strip()
+
+    pattern_map = [
+        (r"some (.+) have little substance\.?$", "일부 {0}은 내용이나 실질이 부족합니다."),
+        (r"some residents disputed the proposal, saying it was based more on emotion than fact\.?$", "일부 주민들은 그 제안이 사실보다 감정에 치우쳐 있다며 이의를 제기했습니다."),
+        (r"some people are only famous within their city\.?$", "어떤 사람들은 자신이 사는 도시 안에서만 유명합니다."),
+        (r"some people are obsessed with (.+)\.?$", "어떤 사람들은 {0}에 지나치게 몰두합니다."),
+        (r"(.+) had always thought (.+) were far superior to (.+), as (.+)\.?$", "{0}는 {1}이 {2}보다 훨씬 낫다고 늘 생각했습니다. {3} 때문입니다."),
+        (r"(.+) is superior to (.+)\.?$", "{0}은 {1}보다 우수합니다."),
+        (r"(.+) are superior to (.+)\.?$", "{0}은 {1}보다 우수합니다."),
+        (r"(.+) was superior to (.+)\.?$", "{0}은 {1}보다 우수했습니다."),
+        (r"(.+) were superior to (.+)\.?$", "{0}은 {1}보다 우수했습니다."),
+        (r"(.+) is based on (.+)\.?$", "{0}은 {1}에 근거합니다."),
+        (r"(.+) was based on (.+)\.?$", "{0}은 {1}에 근거했습니다."),
+        (r"(.+) consists of (.+)\.?$", "{0}은 {1}로 이루어져 있습니다."),
+        (r"(.+) consisted of (.+)\.?$", "{0}은 {1}로 이루어져 있었습니다."),
+        (r"(.+) depends on (.+)\.?$", "{0}은 {1}에 달려 있습니다."),
+        (r"(.+) depend on (.+)\.?$", "{0}은 {1}에 달려 있습니다."),
+        (r"(.+) was charged with (.+)\.?$", "{0}은 {1} 혐의로 기소되었습니다."),
+        (r"(.+) were charged with (.+)\.?$", "{0}은 {1} 혐의로 기소되었습니다."),
+        (r"(.+) prohibited (.+)\.?$", "{0}은 {1}을 금지했습니다."),
+        (r"(.+) prohibits (.+)\.?$", "{0}은 {1}을 금지합니다."),
+        (r"(.+) underwent (.+)\.?$", "{0}은 {1}을 겪었습니다."),
+        (r"(.+) is undergoing (.+)\.?$", "{0}은 현재 {1}을 겪고 있습니다."),
+        (r"(.+) resulted in (.+)\.?$", "{0}은 {1}이라는 결과를 낳았습니다."),
+        (r"(.+) results in (.+)\.?$", "{0}은 {1}이라는 결과를 낳습니다."),
+    ]
+
+    for pattern, template in pattern_map:
+        m = re.match(pattern, lower, flags=re.IGNORECASE)
+        if m:
+            groups = [g.strip() for g in m.groups()]
+            # Keep original English fragments as placeholders when no safe dictionary exists.
+            # This is intentional: users can quickly polish the draft.
+            return template.format(*groups) + "  [초안]"
+
+    # Simple short examples
+    if len(e.split()) <= 5:
+        return f"{meaning}의 예로 쓰인 표현입니다.  [초안]"
+
+    # General fallback
+    return f"이 예문에서 '{word}'는 '{meaning}'의 의미로 쓰였습니다. 자연스러운 한국어 문장으로 다듬어 주세요.  [초안]"
+
+
 @dataclass
 class RowData:
     row_index: int
@@ -372,18 +424,18 @@ class DictionaryWorkbook:
         else:
             ws = self.wb.create_sheet("Translation_Log")
             ws.append(["timestamp", "tool", "note"])
-        ws.append([datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "dictionary_editor_qt_v2.2", note])
+        ws.append([datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "dictionary_editor_qt_v2.3", note])
 
     def save(self) -> None:
         self._style_sheet()
-        self.append_log("Saved from PySide6 Dictionary Editor v2.2")
+        self.append_log("Saved from PySide6 Dictionary Editor v2.3")
         self.wb.save(self.path)
 
 
 class DictionaryEditorWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
-        self.setWindowTitle("DailyVocab Master Dictionary Editor v2.2 Productivity")
+        self.setWindowTitle("DailyVocab Master Dictionary Editor v2.3 Translation Assist")
         self.resize(1520, 880)
 
         self.model = DictionaryWorkbook()
@@ -518,6 +570,9 @@ class DictionaryEditorWindow(QMainWindow):
         self.tags_input.textChanged.connect(self._mark_dirty)
         right_layout.addWidget(self.tags_input)
         right_layout.addWidget(self._section_label("Assist"))
+        self.assist_ko_btn = QPushButton("Example_KO 초안")
+        self.assist_ko_btn.setObjectName("Assist")
+        self.assist_ko_btn.clicked.connect(self.assist_example_ko)
         self.assist_memo_btn = QPushButton("Memo 생성")
         self.assist_memo_btn.setObjectName("Assist")
         self.assist_memo_btn.clicked.connect(self.assist_memo)
@@ -530,6 +585,7 @@ class DictionaryEditorWindow(QMainWindow):
         self.assist_all_btn = QPushButton("Assist All")
         self.assist_all_btn.setObjectName("Assist")
         self.assist_all_btn.clicked.connect(self.assist_all)
+        right_layout.addWidget(self.assist_ko_btn)
         right_layout.addWidget(self.assist_memo_btn)
         right_layout.addWidget(self.assist_tags_btn)
         right_layout.addWidget(self.assist_level_btn)
@@ -712,6 +768,20 @@ class DictionaryEditorWindow(QMainWindow):
             existing.append(tag)
         self.tags_input.setText(", ".join(existing))
 
+    def assist_example_ko(self) -> None:
+        row = self.model.get_current()
+        current = self.example_ko_text.toPlainText().strip()
+        if current:
+            result = QMessageBox.question(
+                self,
+                "Example_KO 초안",
+                "이미 Example_KO 내용이 있습니다. 초안으로 덮어쓸까요?",
+                QMessageBox.Yes | QMessageBox.No,
+            )
+            if result != QMessageBox.Yes:
+                return
+        self.example_ko_text.setPlainText(recommend_example_ko(row.word, row.meaning, row.example))
+
     def assist_memo(self) -> None:
         row = self.model.get_current()
         self.memo_text.setPlainText(recommend_memo(row.word, row.meaning, row.example))
@@ -725,6 +795,9 @@ class DictionaryEditorWindow(QMainWindow):
         self.level_combo.setCurrentText(recommend_level(row.word, row.example))
 
     def assist_all(self) -> None:
+        row = self.model.get_current()
+        if not self.example_ko_text.toPlainText().strip():
+            self.example_ko_text.setPlainText(recommend_example_ko(row.word, row.meaning, row.example))
         self.assist_memo()
         self.assist_tags()
         self.assist_level()
