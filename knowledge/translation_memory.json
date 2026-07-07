@@ -22,5 +22,23 @@
     "count": 1,
     "confidence": 95,
     "last_used": ""
+  },
+  "She's the first athlete in her sport to obtain a corporate sponsor.": {
+    "ko": "그녀는 그녀의 스포츠 분야에서 기업 스폰서십을 받은 첫번째 선수입니다.",
+    "count": 1,
+    "confidence": 88,
+    "last_used": "2026-07-07 17:06:40"
+  },
+  "She's taller than I am;  she found his advice more witty than helpful;  we have less work today than we had yesterday;  We had no choice than to return home.": {
+    "ko": "그녀는 나보다 키가 크고, 그의 조언이 도움이 되기보다는 재치 있다고 생각했습니다. 우리는 어제보다 오늘 일이 덜하여서, 집으로 돌아가는 것 외에는 선택의 여지가 없었습니다.",
+    "count": 3,
+    "confidence": 88,
+    "last_used": "2026-07-07 18:02:46"
+  },
+  "She's studying medicine at university because she wants to be a doctor in the future.": {
+    "ko": "medicine가 '약'의 뜻으로 쓰인 예문입니다. 문맥에 맞게 한국어로 다듬어 주세요.  [초안]",
+    "count": 1,
+    "confidence": 88,
+    "last_used": "2026-07-07 18:02:55"
   }
 }
