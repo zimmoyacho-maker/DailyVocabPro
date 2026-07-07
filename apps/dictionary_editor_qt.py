@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-DailyVocabPro Master Dictionary Editor v2.5
+DailyVocabPro Master Dictionary Editor v2.6
 Knowledge Engine Integrated
 """
 
@@ -171,17 +171,17 @@ class DictionaryWorkbook:
         ws = self.wb["Translation_Log"] if "Translation_Log" in self.wb.sheetnames else self.wb.create_sheet("Translation_Log")
         if ws.max_row == 1 and not ws.cell(1,1).value:
             ws.append(["timestamp","tool","note"])
-        ws.append([datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "dictionary_editor_qt_v2.5", note])
+        ws.append([datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "dictionary_editor_qt_v2.6", note])
 
     def save(self):
         self.style()
-        self.append_log("Saved from Editor v2.5 Production Mode")
+        self.append_log("Saved from Editor v2.6 All-in-One")
         self.wb.save(self.path)
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("DailyVocab Master Dictionary Editor v2.5 Production Mode")
+        self.setWindowTitle("DailyVocab Master Dictionary Editor v2.6 All-in-One")
         self.resize(1520, 880)
         self.model = DictionaryWorkbook()
         self.engine = KnowledgeEngine()
@@ -235,6 +235,8 @@ class MainWindow(QMainWindow):
         self.goto_btn = QPushButton("Go"); self.goto_btn.clicked.connect(self.goto_row)
         toolbar.addWidget(self.goto_input); toolbar.addWidget(self.goto_btn)
         self.save_state_label = QLabel("● No file"); toolbar.addWidget(self.save_state_label)
+        self.shortcut_label = QLabel("Keyboard: Ctrl+Enter Save+Next | Ctrl+Space Assist | Ctrl+B Gold | Ctrl+Q QA")
+        toolbar.addWidget(self.shortcut_label)
         root.addLayout(toolbar)
 
         top = QFrame(); top.setObjectName("Card"); top_layout = QGridLayout(top)
@@ -288,6 +290,10 @@ class MainWindow(QMainWindow):
         right_l.addWidget(self.golden_btn)
         right_l.addWidget(self.section("Confidence")); self.confidence_label = QLabel("No suggestion yet"); self.confidence_label.setWordWrap(True); right_l.addWidget(self.confidence_label)
         right_l.addWidget(self.section("Suggestion Reasons")); self.reasons_text = QPlainTextEdit(); self.reasons_text.setReadOnly(True); self.reasons_text.setMaximumHeight(95); right_l.addWidget(self.reasons_text)
+        right_l.addWidget(self.section("Engine Assets"))
+        self.engine_assets_label = QLabel("TM + Phrase + Noun + Verb Patterns")
+        self.engine_assets_label.setWordWrap(True)
+        right_l.addWidget(self.engine_assets_label)
         right_l.addWidget(self.section("QA Flag")); self.qa_flag_label = QLabel("OK"); self.qa_flag_label.setWordWrap(True); right_l.addWidget(self.qa_flag_label)
         right_l.addWidget(self.section("QA Summary")); self.qa_summary_text = QPlainTextEdit(); self.qa_summary_text.setReadOnly(True); right_l.addWidget(self.qa_summary_text,1)
 
@@ -363,7 +369,7 @@ class MainWindow(QMainWindow):
                 self.engine.add_golden("translations", row["example"], ko, f"{row['word']} / {row['meaning']}")
             if memo:
                 self.engine.add_golden("memos", row["word"], memo, row["example"])
-            self.statusBar().showMessage("⭐ Golden Collection에 저장했습니다.")
+            self.statusBar().showMessage("⭐ Golden Collection에 저장했습니다: knowledge/golden_collection.json")
         except Exception as e:
             QMessageBox.warning(self, "Golden 저장", f"저장 중 오류가 발생했습니다: {e}")
 
@@ -394,6 +400,16 @@ class MainWindow(QMainWindow):
         self.confidence_label.setText(f"{label} Confidence: {s.confidence}%")
         self.confidence_label.setStyleSheet(f"color:{color}; font-weight:700;")
         self.reasons_text.setPlainText("\n".join(s.reasons) if s.reasons else "No specific reason.")
+        if hasattr(self, "engine_assets_label"):
+            try:
+                self.engine_assets_label.setText(
+                    f"TM {len(self.engine.translation_memory)} | "
+                    f"Phrase {len(self.engine.phrase_dictionary)} | "
+                    f"Noun {len(getattr(self.engine, 'noun_phrases', {}))} | "
+                    f"Verb {len(getattr(self.engine, 'verb_patterns', {}))}"
+                )
+            except Exception:
+                pass
         return s
 
     def assist_example_ko(self):
