@@ -1,0 +1,52 @@
+{
+  "be superior to": {
+    "ko": "~보다 우수하다",
+    "note": "superior는 than이 아니라 to와 함께 사용합니다.",
+    "confidence": 98
+  },
+  "be based on": {
+    "ko": "~에 근거하다",
+    "note": "근거, 기준, 원인을 설명할 때 사용합니다.",
+    "confidence": 98
+  },
+  "consist of": {
+    "ko": "~로 이루어져 있다",
+    "note": "구성 요소를 설명할 때 사용합니다.",
+    "confidence": 98
+  },
+  "result in": {
+    "ko": "~라는 결과를 낳다 / ~을 초래하다",
+    "note": "결과를 나타내는 중요 표현입니다.",
+    "confidence": 96
+  },
+  "according to": {
+    "ko": "~에 따르면",
+    "note": "출처나 기준을 제시할 때 사용합니다.",
+    "confidence": 99
+  },
+  "rather than": {
+    "ko": "~라기보다 / ~보다는",
+    "note": "대조와 선택을 나타냅니다.",
+    "confidence": 96
+  },
+  "as a result": {
+    "ko": "그 결과",
+    "note": "결과를 연결하는 표현입니다.",
+    "confidence": 97
+  },
+  "be obsessed with": {
+    "ko": "~에 지나치게 몰두하다 / ~에 집착하다",
+    "note": "with와 함께 쓰이는 표현입니다.",
+    "confidence": 98
+  },
+  "be charged with": {
+    "ko": "~혐의로 기소되다",
+    "note": "법률·뉴스 문맥에서 자주 쓰입니다.",
+    "confidence": 97
+  },
+  "have little substance": {
+    "ko": "실질이 부족하다",
+    "note": "substance가 '실질, 내용'의 뜻으로 쓰인 표현입니다.",
+    "confidence": 96
+  }
+}
