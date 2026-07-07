@@ -1,0 +1,73 @@
+{
+  "achieve": {
+    "success": "{subject} {object}을/를 거두었습니다.",
+    "goal": "{subject} 목표를 달성했습니다.",
+    "goals": "{subject} 목표를 달성했습니다.",
+    "result": "{subject} 성과를 냈습니다.",
+    "results": "{subject} 성과를 냈습니다.",
+    "growth": "{subject} 성장을 이루었습니다.",
+    "progress": "{subject} 진전을 이루었습니다.",
+    "independence": "{subject} 독립을 이루었습니다.",
+    "recognition": "{subject} 인정을 받았습니다.",
+    "default": "{subject} {object}을/를 달성했습니다."
+  },
+  "provide": {
+    "service": "{subject} {target}에게 서비스를 제공합니다.",
+    "services": "{subject} {target}에게 서비스를 제공합니다.",
+    "support": "{subject} {target}에게 지원을 제공합니다.",
+    "information": "{subject} 정보를 제공합니다.",
+    "opportunity": "{subject} 기회를 제공합니다.",
+    "opportunities": "{subject} 기회를 제공합니다.",
+    "default": "{subject} {object}을/를 제공합니다."
+  },
+  "allow": {
+    "default": "{subject} {object}을/를 허용합니다."
+  },
+  "prevent": {
+    "disease": "{subject} 질병을 예방합니다.",
+    "damage": "{subject} 피해를 막습니다.",
+    "default": "{subject} {object}을/를 막습니다."
+  },
+  "require": {
+    "effort": "{subject} 노력을 필요로 합니다.",
+    "time": "{subject} 시간이 필요합니다.",
+    "default": "{subject} {object}을/를 필요로 합니다."
+  },
+  "improve": {
+    "quality": "{subject} 품질을 향상시킵니다.",
+    "performance": "{subject} 성과를 향상시킵니다.",
+    "health": "{subject} 건강을 개선합니다.",
+    "skills": "{subject} 기술을 향상시킵니다.",
+    "default": "{subject} {object}을/를 개선합니다."
+  },
+  "reduce": {
+    "cost": "{subject} 비용을 줄입니다.",
+    "costs": "{subject} 비용을 줄입니다.",
+    "risk": "{subject} 위험을 줄입니다.",
+    "default": "{subject} {object}을/를 줄입니다."
+  },
+  "increase": {
+    "sales": "{subject} 매출을 증가시킵니다.",
+    "speed": "{subject} 속도를 높입니다.",
+    "default": "{subject} {object}을/를 증가시킵니다."
+  },
+  "maintain": {
+    "standards": "{subject} 기준을 유지합니다.",
+    "quality": "{subject} 품질을 유지합니다.",
+    "balance": "{subject} 균형을 유지합니다.",
+    "default": "{subject} {object}을/를 유지합니다."
+  },
+  "support": {
+    "family": "{subject} 가족을 부양합니다.",
+    "project": "{subject} 프로젝트를 지원합니다.",
+    "research": "{subject} 연구를 지원합니다.",
+    "default": "{subject} {object}을/를 지원합니다."
+  },
+  "develop": {
+    "skill": "{subject} 기술을 개발합니다.",
+    "skills": "{subject} 기술을 개발합니다.",
+    "system": "{subject} 시스템을 개발합니다.",
+    "product": "{subject} 제품을 개발합니다.",
+    "default": "{subject} {object}을/를 개발합니다."
+  }
+}
