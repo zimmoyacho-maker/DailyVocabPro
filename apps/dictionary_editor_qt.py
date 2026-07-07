@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-DailyVocabPro Master Dictionary Editor v2.4
+DailyVocabPro Master Dictionary Editor v2.5
 Knowledge Engine Integrated
 """
 
@@ -171,17 +171,17 @@ class DictionaryWorkbook:
         ws = self.wb["Translation_Log"] if "Translation_Log" in self.wb.sheetnames else self.wb.create_sheet("Translation_Log")
         if ws.max_row == 1 and not ws.cell(1,1).value:
             ws.append(["timestamp","tool","note"])
-        ws.append([datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "dictionary_editor_qt_v2.4", note])
+        ws.append([datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "dictionary_editor_qt_v2.5", note])
 
     def save(self):
         self.style()
-        self.append_log("Saved from Editor v2.4 Knowledge Integrated")
+        self.append_log("Saved from Editor v2.5 Production Mode")
         self.wb.save(self.path)
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("DailyVocab Master Dictionary Editor v2.4 Knowledge Integrated")
+        self.setWindowTitle("DailyVocab Master Dictionary Editor v2.5 Production Mode")
         self.resize(1520, 880)
         self.model = DictionaryWorkbook()
         self.engine = KnowledgeEngine()
@@ -194,7 +194,26 @@ class MainWindow(QMainWindow):
 
     def build_actions(self):
         save = QAction("Save", self); save.setShortcut(QKeySequence.Save); save.triggered.connect(self.save_file); self.addAction(save)
-        save_next = QAction("Save Next", self); save_next.setShortcut("Ctrl+Return"); save_next.triggered.connect(self.save_and_next); self.addAction(save_next)
+
+        save_next = QAction("Save Next", self)
+        save_next.setShortcut("Ctrl+Return")
+        save_next.triggered.connect(self.save_and_next)
+        self.addAction(save_next)
+
+        assist_all = QAction("Assist All", self)
+        assist_all.setShortcut("Ctrl+Space")
+        assist_all.triggered.connect(self.assist_all)
+        self.addAction(assist_all)
+
+        qa = QAction("QA Check", self)
+        qa.setShortcut("Ctrl+Q")
+        qa.triggered.connect(self.run_qa)
+        self.addAction(qa)
+
+        golden = QAction("Add Golden", self)
+        golden.setShortcut("Ctrl+B")
+        golden.triggered.connect(self.add_golden_current)
+        self.addAction(golden)
 
     def section(self, text):
         label = QLabel(text); label.setObjectName("SectionTitle"); return label
@@ -236,6 +255,9 @@ class MainWindow(QMainWindow):
         self.apply_batch_btn = QPushButton("적용"); self.apply_batch_btn.clicked.connect(self.apply_batch_filter)
         br.addWidget(self.batch_start); br.addWidget(QLabel("~")); br.addWidget(self.batch_end); br.addWidget(self.apply_batch_btn); left_l.addLayout(br)
         self.incomplete_only = QCheckBox("미완료만 보기"); self.incomplete_only.stateChanged.connect(self.apply_batch_filter); left_l.addWidget(self.incomplete_only)
+        self.auto_assist = QCheckBox("Auto Assist")
+        self.auto_assist.setChecked(True)
+        left_l.addWidget(self.auto_assist)
         self.word_list = QListWidget(); self.word_list.itemClicked.connect(self.open_word_list_item); left_l.addWidget(self.word_list,1)
         self.dashboard = QPlainTextEdit(); self.dashboard.setReadOnly(True); self.dashboard.setMaximumHeight(140); left_l.addWidget(self.dashboard)
 
@@ -260,6 +282,10 @@ class MainWindow(QMainWindow):
         self.assist_level_btn = QPushButton("Level 추천"); self.assist_level_btn.setObjectName("Assist"); self.assist_level_btn.clicked.connect(self.assist_level)
         self.assist_all_btn = QPushButton("Assist All"); self.assist_all_btn.setObjectName("Assist"); self.assist_all_btn.clicked.connect(self.assist_all)
         for b in [self.assist_ko_btn,self.assist_memo_btn,self.assist_tags_btn,self.assist_level_btn,self.assist_all_btn]: right_l.addWidget(b)
+        self.golden_btn = QPushButton("⭐ Golden 저장")
+        self.golden_btn.setObjectName("Assist")
+        self.golden_btn.clicked.connect(self.add_golden_current)
+        right_l.addWidget(self.golden_btn)
         right_l.addWidget(self.section("Confidence")); self.confidence_label = QLabel("No suggestion yet"); self.confidence_label.setWordWrap(True); right_l.addWidget(self.confidence_label)
         right_l.addWidget(self.section("Suggestion Reasons")); self.reasons_text = QPlainTextEdit(); self.reasons_text.setReadOnly(True); self.reasons_text.setMaximumHeight(95); right_l.addWidget(self.reasons_text)
         right_l.addWidget(self.section("QA Flag")); self.qa_flag_label = QLabel("OK"); self.qa_flag_label.setWordWrap(True); right_l.addWidget(self.qa_flag_label)
@@ -302,6 +328,45 @@ class MainWindow(QMainWindow):
         total = len(self.visible_rows); rate = int(complete/total*100) if total else 0
         self.dashboard.setPlainText(f"Batch Dashboard\n---------------\nVisible: {total}\nComplete: {complete}\nRemaining: {total-complete}\nRate: {rate}%")
 
+    def maybe_auto_assist(self):
+        if not hasattr(self, "auto_assist") or not self.auto_assist.isChecked():
+            return
+        if not self.model.data_rows:
+            return
+        # Only fill empty fields automatically. Existing user content is preserved.
+        row = self.model.get_current()
+        s = self.suggestion()
+        changed = False
+        if not self.example_ko_text.toPlainText().strip():
+            self.example_ko_text.setPlainText(s.example_ko)
+            changed = True
+        if not self.memo_text.toPlainText().strip():
+            self.memo_text.setPlainText(s.memo)
+            changed = True
+        if not self.tags_input.text().strip():
+            self.tags_input.setText(s.tags)
+            changed = True
+        if not self.level_combo.currentText().strip():
+            self.level_combo.setCurrentText(s.level)
+            changed = True
+        if changed:
+            self.mark_dirty()
+
+    def add_golden_current(self):
+        if not self.model.data_rows:
+            return
+        row = self.model.get_current()
+        ko = self.example_ko_text.toPlainText().strip()
+        memo = self.memo_text.toPlainText().strip()
+        try:
+            if ko:
+                self.engine.add_golden("translations", row["example"], ko, f"{row['word']} / {row['meaning']}")
+            if memo:
+                self.engine.add_golden("memos", row["word"], memo, row["example"])
+            self.statusBar().showMessage("⭐ Golden Collection에 저장했습니다.")
+        except Exception as e:
+            QMessageBox.warning(self, "Golden 저장", f"저장 중 오류가 발생했습니다: {e}")
+
     def load_current_to_ui(self):
         row = self.model.get_current()
         self.row_label.setText(f"Excel Row {row['row']}"); self.progress_label.setText(f"{self.model.current_pos+1} / {self.model.count()}")
@@ -318,6 +383,7 @@ class MainWindow(QMainWindow):
         self.goto_input.setText(str(row["row"]))
         self.confidence_label.setText("No suggestion yet"); self.confidence_label.setStyleSheet(""); self.reasons_text.setPlainText("")
         self.dirty = False; self.save_state_label.setText("● Saved")
+        self.maybe_auto_assist()
 
     def suggestion(self):
         row = self.model.get_current()

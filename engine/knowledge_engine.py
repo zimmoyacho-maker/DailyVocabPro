@@ -141,3 +141,13 @@ class KnowledgeEngine:
         item=self.phrase_dictionary.get(phrase,{})
         item["ko"]=korean; item["note"]=note or item.get("note",""); item["confidence"]=max(int(item.get("confidence",0) or 0), confidence); item["last_used"]=now_iso()
         self.phrase_dictionary[phrase]=item; self.save()
+
+    def add_golden(self, category, english, korean, note=""):
+        category = category if category in self.golden_collection else "translations"
+        self.golden_collection.setdefault(category, []).append({
+            "english": english,
+            "korean": korean,
+            "note": note,
+            "created_at": now_iso()
+        })
+        self.save()
