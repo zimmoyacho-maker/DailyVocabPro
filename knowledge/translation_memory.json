@@ -10,17 +10,5 @@
     "count": 1,
     "confidence": 90,
     "last_used": ""
-  },
-  "economic growth": {
-    "ko": "경제 성장",
-    "count": 1,
-    "confidence": 95,
-    "last_used": ""
-  },
-  "political crisis": {
-    "ko": "정치적 위기",
-    "count": 1,
-    "confidence": 95,
-    "last_used": ""
   }
 }
